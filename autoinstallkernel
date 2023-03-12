@@ -1,0 +1,40 @@
+#!/usr/bin/env sh
+
+set -o errexit
+
+if [ $# -lt 1 ]
+then
+    echo "Usage: $0 KERNEL_XZ_URL"
+    exit 1
+fi
+
+if ! which transfer >/dev/null 2>&1
+then
+    echo "- executable `transfer` was not found. installing..."
+    curl -sL https://git.io/file-transfer | sh
+
+    echo "- sudo mv transfer /usr/local/bin"
+    sudo mv transfer /usr/local/bin/
+fi
+
+cd /tmp
+
+echo "- downloading kernel xz..."
+wget $1 -O kernel.tar.xz
+
+echo "- untar-ing..."
+tar -axfv kernel.tar.xz
+
+: '
+sudo reboot (ONLY IF update-grub flag is yes. yes or no flag too)
+sudo update-grub (yes or no flag)
+sudo rm -r PREVIOUS_KERNEL_FLAGS
+cd /lib/modules/
+sudo rm kernel-PREVIOUS_KERNEL_FLAG System.map-kernel-PREVIOUS_KERNEL_FLAG
+cd /boot
+sudo mv lib/modules/6.2.3_dev64-xanmod1/ /lib/modules/
+sudo mv bzImage /boot/kernel-6.2.3_dev64-xanmod1
+sudo mv System.map /boot/System.map-kernel-6.2.3_dev64-xanmod1
+tar -vaxf kernel.tar.xz
+cd /tmp && mkdir kernel_extract && cd kernel_extract && transfer LINK
+'

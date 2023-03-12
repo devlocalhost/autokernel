@@ -1,0 +1,123 @@
+#!/usr/bin/env sh
+
+set -o errexit
+
+COL_RED='\033[1;31m'
+COL_GRN='\033[1;32m'
+COL_YEL='\033[1;33m'
+COL_RST='\033[0m'
+
+# setting up arguments
+OUTPUT=${1:-no}
+CONFIG_URL=$2
+O3_PATCH=${3:-no}
+DEPTH=${4:-NONE}
+RT_PATCH=${5:-no}
+EX_MENUCONFIG=${6:-no}
+
+cecho() {
+    echo "$1$2${COL_RST}"
+}
+
+ex_cmd() {
+    if [ "$OUTPUT" != "no" ]
+    then
+        "$@"                 # OUTPUT
+    else
+        "$@" >/dev/null 2>&1 # QUIET
+    fi
+}
+
+if [ $# -lt 1 ]
+then
+    cecho $COL_YEL "Usage: $0 OUTPUT (yes or no) CONFIG_URL (url) O3_PATCH (url or no) DEPTH (int or no) RT_PATCH (yes or no) EX_MENUCONFIG (yes or no)"
+    exit 1
+fi
+
+cecho ${COL_YEL} " Compiling with:"
+cecho ${COL_YEL} "         OUTPUT: ${OUTPUT}"
+cecho ${COL_YEL} "         CONFIG: $CONFIG_URL"
+cecho ${COL_YEL} "             O3: $O3_PATCH"
+cecho ${COL_YEL} "          DEPTH: $DEPTH"
+cecho ${COL_YEL} "             RT: $RT_PATCH"
+cecho ${COL_YEL} "     menuconfig: $EX_MENUCONFIG"
+
+cecho ${COL_YEL} "Continue? (y/n): "
+read answer
+
+if [ "$answer" != "${answer#[nN]}" ]
+then
+    cecho ${COL_RED} "- abort"
+    exit 0
+fi
+
+# installing the dependecies
+cecho ${COL_YEL} "- Installing the dependecies..."
+ex_cmd sudo apt install -y flex m4 lz4 clang-12 lld-12 kmod
+
+# install transfer
+cecho ${COL_GRN} "- downloading the transfer script..."
+ex_cmd curl -sL -o file-transfer https://git.io/file-transfer && chmod +x file-transfer && ex_cmd ./file-transfer && rm file-transfer
+
+# git cloning
+if [ "$DEPTH" != "NONE" ]
+then
+    cecho ${COL_GRN} "- cloning the kernel with depth $DEPTH..."
+    ex_cmd git clone https://github.com/xanmod/linux --depth "$DEPTH"
+else
+    cecho ${COL_GRN} "- cloning the kernel..."
+    ex_cmd git clone https://github.com/xanmod/linux
+fi
+
+# cd to xanmod linux dir and wget config
+cecho ${COL_GRN} "- downloading the kernel config..."
+ex_cmd cd linux && ex_cmd wget $CONFIG_URL -O .config
+
+# enable o3?
+if [ "$O3_PATCH" != "no" ]
+then
+    cecho ${COL_YEL} "- enabling O3 and adding the patched files..."
+    ex_cmd wget "$O3_PATCH" -O o3.patch && ex_cmd patch -p1 -i o3.patch && ex_cmd git add Makefile && ex_cmd git add init/Kconfig
+fi
+
+# enable rt?
+if [ "$RT_PATCH" != "no" ]
+then
+    cecho ${COL_YEL} "- enabling RT..."
+    ex_cmd curl https://github.com/Skyblueborb/kernel_x86_nehalem_gentoo/commit/04eca30fe1012c0ad36252b8446eb3ae9ce42298.patch | ex_cmd git am
+fi
+
+# execute make menuconfig?
+if [ "$EX_MENUCONFIG" != "no" ]
+then
+    cecho ${COL_YEL} "- RUNNING MENUCONFIG"
+    make menuconfig LLVM=1 CC=clang-12 LD=ld.lld-12
+fi
+
+# make dir to paste system map and bzimage
+cecho ${COL_GRN} "- create directory OUT_KERNEL"
+mkdir OUT_KERNEL
+
+# start compiling the kernel
+cecho ${COL_YEL} "- COMPILING THE KERNEL..."
+time make arch=i686 CLANG_TRIPLE=i686-linux-gnu- LLVM_IAS=1 CC=clang-12 LD=ld.lld-12 AR=llvm-ar-12 NM=llvm-nm-12 STRIP=llvm-strip-12 OBJCOPY=llvm-objcopy-12 OBJDUMP=llvm-objdump-12 READELF=llvm-readelf-12 HOSTCC=clang-12 HOSTCXX=clang++-12 HOSTAR=llvm-ar-12 HOSTLD=ld.lld-12 LLVM=1 -j16
+
+# and the modules
+cecho ${COL_YEL} "- compiling the modules..."
+time make arch=i686 CLANG_TRIPLE=i686-linux-gnu- LLVM_IAS=1 CC=clang-12 LD=ld.lld-12 AR=llvm-ar-12 NM=llvm-nm-12 STRIP=llvm-strip-12 OBJCOPY=llvm-objcopy-12 OBJDUMP=llvm-objdump-12 READELF=llvm-readelf-12 HOSTCC=clang-12 HOSTCXX=clang++-12 HOSTAR=llvm-ar-12 HOSTLD=ld.lld-12 LLVM=1 -j16 INSTALL_MOD_PATH=OUT_KERNEL modules_install
+
+# copy the kernel and system map file to out kernel
+cecho ${COL_GRN} "- copying arc/x86/boot/bzImage and System.map files to OUT_KERNEL..."
+cp arch/x86/boot/bzImage OUT_KERNEL
+cp System.map OUT_KERNEL
+
+# cd to out kernel and xzip everything
+cecho ${COL_YEL} "- tar-xz-chiving everything..."
+cd OUT_KERNEL
+XZ_OPT=-9 tar cJf kernel.tar.xz *
+
+# and upload it
+cecho ${COL_YEL} "- and uploading the tar-xz-chive..."
+../transfer wet kernel.tar.xz
+
+cecho ${COL_GRN} "- all done"
