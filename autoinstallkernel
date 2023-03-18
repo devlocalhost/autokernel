@@ -27,7 +27,7 @@ ex_cmd() {
     fi
 }
 
-if [ $EUID -eq 1 ]
+if [ "$(id -u)" != 0 ]
 then
     cecho $COL_RED "- not running as root. please run the script as root"
     exit 1
@@ -95,21 +95,10 @@ fi
 
 if [ "$UPDATE_GRUB_AND_OR_NO_REBOOT" = "yes" ]
 then
-    # how do i handle this now...?
-    : 'if ! which update-grub >/dev/null 2>&1
-    then
-        cecho $COL_RED "- update-grub executable NOT FOUND. use grub-mkconfig -o /boot/grub/cfg instead? (y/n)"
-        read answer
-
-        if [ "$answer" != "${answer#[nN]}" ]
-        then
-        grub-mkconfig -o /boot/grub/grub.cfg
-    '
-
     cecho $COL_YEL "- updating grub..."
     ex_cmd update-grub
 elif [ "$UPDATE_GRUB_AND_OR_NO_REBOOT" = "yesr" ]
 then
-    cecho "- updating grub AND rebooting..."
+    cecho $COL_YEL "- updating grub AND rebooting..."
     ex_cmd update-grub && cecho $COL_GRN "- all done. rebooting..." && reboot
 fi
