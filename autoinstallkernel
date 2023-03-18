@@ -2,39 +2,114 @@
 
 set -o errexit
 
-if [ $# -lt 1 ]
+# colors
+COL_RED='\033[1;31m'
+COL_GRN='\033[1;32m'
+COL_YEL='\033[1;33m'
+COL_RST='\033[0m'
+
+# setting up arguments
+OUTPUT=${1:-no}
+KERNEL_FILE_NAME=$3
+REMOVE_OLD_KERNEL=${4:-no}
+UPDATE_GRUB_AND_OR_NO_REBOOT=${5:-no} # yes: update no reboot, yesr: update and reboot, no: dont update and reboot
+
+cecho() {
+    echo "$1$2${COL_RST}"
+}
+
+ex_cmd() {
+    if [ "$OUTPUT" != "no" ]
+    then
+        "$@"                 # OUTPUT
+    else
+        "$@" >/dev/null 2>&1 # QUIET
+    fi
+}
+
+if [ $EUID -eq 1 ]
 then
-    echo "Usage: $0 KERNEL_XZ_URL"
+    cecho $COL_RED "- not running as root. please run the script as root"
     exit 1
 fi
 
-if ! which transfer >/dev/null 2>&1
+if [ $# -lt 2 ]
 then
-    echo "- executable `transfer` was not found. installing..."
-    curl -sL https://git.io/file-transfer | sh
+    cecho $COL_GRN "    Usage: $0 OUTPUT (yes or no) KERNEL_XZ_URL KERNEL_FILE_NAME (required, example 6.1.13_dev64-rt7-xanmod1) REMOVE_OLD_KERNEL (yes or no) UPDATE_GRUB_AND_OR_NO_REBOOT (yes, yesr or no)\n\n Defaults:    OUTPUT: no. accepts: yes, no\n   REMOVE_OLD_KERNEL: no. accepts: yes, no\n  UPDATE_GRUB_AND...: no. accepts: yes, yesr (update and reboot), no"
+    exit 1
+fi
 
-    echo "- sudo mv transfer /usr/local/bin"
-    sudo mv transfer /usr/local/bin/
+cecho ${COL_YEL} "    Installing with:"
+cecho ${COL_YEL} "             OUTPUT: $OUTPUT"
+cecho ${COL_YEL} "      KERNEL_XZ_URL: $2"
+cecho ${COL_YEL} "   KERNEL_FILE_NAME: $KERNEL_FILE_NAME"
+cecho ${COL_YEL} "  REMOVE_OLD_KERNEL: $REMOVE_OLD_KERNEL"
+cecho ${COL_YEL} " UPDATE_GRUB_AND...: $UPDATE_GRUB_AND_OR_NO_REBOOT"
+cecho ${COL_YEL} "    Continue? (y/n):"
+
+read answer
+
+if [ "$answer" != "${answer#[nN]}" ]
+then
+    cecho ${COL_RED} "- abort"
+    exit 0
 fi
 
 cd /tmp
+mkdir kernel_out
+cd kernel_out
 
-echo "- downloading kernel xz..."
-wget $1 -O kernel.tar.xz
+if ! which transfer >/dev/null 2>&1
+then
+    cecho $COL_RED "- transfer script not found. move the transfer file to /usr/local/bin if you want to keep it. downloading..."
+    ex_cmd curl -sL -o file-transfer https://git.io/file-transfer && chmod +x file-transfer && ex_cmd ./file-transfer && rm file-transfer
+fi
 
-echo "- untar-ing..."
-tar -axfv kernel.tar.xz
+cecho $COL_YEL "- downloading kernel.tar.xz..."
+ex_cmd transfer wet $2
 
-: '
-sudo reboot (ONLY IF update-grub flag is yes. yes or no flag too)
-sudo update-grub (yes or no flag)
-sudo rm -r PREVIOUS_KERNEL_FLAGS
-cd /lib/modules/
-sudo rm kernel-PREVIOUS_KERNEL_FLAG System.map-kernel-PREVIOUS_KERNEL_FLAG
-cd /boot
-sudo mv lib/modules/6.2.3_dev64-xanmod1/ /lib/modules/
-sudo mv bzImage /boot/kernel-6.2.3_dev64-xanmod1
-sudo mv System.map /boot/System.map-kernel-6.2.3_dev64-xanmod1
-tar -vaxf kernel.tar.xz
-cd /tmp && mkdir kernel_extract && cd kernel_extract && transfer LINK
-'
+cecho $COL_YEL "- untar-ing..."
+ex_cmd tar -axf kernel.tar.xz
+
+cecho $COL_YEL "- moving bzImage to /boot as $KERNEL_FILE_NAME"
+cp bzImage /boot/kernel-$KERNEL_FILE_NAME
+
+cecho $COL_YEL "- moving System.map to /boot as System.map-$KERNEL_FILE_NAME"
+cp System.map /boot/System.map-kernel-$KERNEL_FILE_NAME
+
+cecho $COL_YEL "- moving lib/modules/* to /lib/modules as $KERNEL_FILE_NAME"
+cp -r lib/modules/* /lib/modules/
+
+if [ "$REMOVE_OLD_KERNEL" = "yes" ]
+then
+    cecho $COL_RED "- REMOVING CURRENT KERNEL..."
+
+    CURRENT_KERNEL=$(uname -r)
+    cd /boot
+    rm *$CURRENT_KERNEL*
+
+    cecho $COL_RED "- REMOVING /LIB/MODULES..."
+    cd /lib/modules/
+    rm -r *$CURRENT_KERNEL*
+fi
+
+if [ "$UPDATE_GRUB_AND_OR_NO_REBOOT" = "yes" ]
+then
+    # how do i handle this now...?
+    : 'if ! which update-grub >/dev/null 2>&1
+    then
+        cecho $COL_RED "- update-grub executable NOT FOUND. use grub-mkconfig -o /boot/grub/cfg instead? (y/n)"
+        read answer
+
+        if [ "$answer" != "${answer#[nN]}" ]
+        then
+        grub-mkconfig -o /boot/grub/grub.cfg
+    '
+
+    cecho $COL_YEL "- updating grub..."
+    ex_cmd update-grub
+elif [ "$UPDATE_GRUB_AND_OR_NO_REBOOT" = "yesr" ]
+then
+    cecho "- updating grub AND rebooting..."
+    ex_cmd update-grub && cecho $COL_GRN "- all done. rebooting..." && reboot
+fi
