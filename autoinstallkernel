@@ -27,15 +27,15 @@ ex_cmd() {
     fi
 }
 
-if [ "$(id -u)" != 0 ]
+if [ $# -lt 2 ]
 then
-    cecho $COL_RED "- not running as root. please run the script as root"
+    cecho $COL_GRN "    Usage: $0 OUTPUT KERNEL_XZ_URL KERNEL_FILE_NAME REMOVE_OLD_KERNEL UPDATE_GRUB_AND_OR_NO_REBOOT\n Defaults:    OUTPUT: no. accepts: yes, no\n   REMOVE_OLD_KERNEL: no. ~~~~~~~~~~~~~~~~\n  UPDATE_GRUB_AND...: no. ~~~~~~~~~~~~, yesr (update and reboot), no"
     exit 1
 fi
 
-if [ $# -lt 2 ]
+if [ "$(id -u)" != 0 ]
 then
-    cecho $COL_GRN "    Usage: $0 OUTPUT (yes or no) KERNEL_XZ_URL KERNEL_FILE_NAME (required, example 6.1.13_dev64-rt7-xanmod1) REMOVE_OLD_KERNEL (yes or no) UPDATE_GRUB_AND_OR_NO_REBOOT (yes, yesr or no)\n\n Defaults:    OUTPUT: no. accepts: yes, no\n   REMOVE_OLD_KERNEL: no. accepts: yes, no\n  UPDATE_GRUB_AND...: no. accepts: yes, yesr (update and reboot), no"
+    cecho $COL_RED "- not running as root. please run the script as root"
     exit 1
 fi
 

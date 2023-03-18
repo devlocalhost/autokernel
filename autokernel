@@ -10,7 +10,7 @@ COL_RST='\033[0m'
 
 # setting up arguments
 OUTPUT=${1:-no}
-CONFIG_URL=$2
+CONFIG=$2
 O3_PATCH=${3:-no}
 DEPTH=${4:-NONE}
 RT_PATCH=${5:-no}
@@ -31,13 +31,13 @@ ex_cmd() {
 
 if [ $# -lt 1 ]
 then
-    cecho $COL_GRN "Usage: $0 OUTPUT (yes or no) CONFIG_URL (url) O3_PATCH (url or no) DEPTH (int or no) RT_PATCH (yes or no) EX_MENUCONFIG (yes or no)"
+    cecho $COL_GRN "   Usage: $0 OUTPUT CONFIG O3_PATCH DEPTH RT_PATCH EX_MENUCONFIG\nDefaults: OUTPUT: no. accepts: yes, no\n        O3_PATCH: no. ~~~~~~~~~~~~~~~~\n           DEPTH: NONE. accepts: nothing or int (num, value)\n        RT_PATCH: no. accepts: yes, no\n    EX_MENUCOFIG: no. ~~~~~~~~~~~~~~~~"
     exit 1
 fi
 
 cecho ${COL_YEL} " Compiling with:"
 cecho ${COL_YEL} "         OUTPUT: ${OUTPUT}"
-cecho ${COL_YEL} "         CONFIG: $CONFIG_URL"
+cecho ${COL_YEL} "         CONFIG: $CONFIG"
 cecho ${COL_YEL} "             O3: $O3_PATCH"
 cecho ${COL_YEL} "          DEPTH: $DEPTH"
 cecho ${COL_YEL} "             RT: $RT_PATCH"
@@ -71,8 +71,8 @@ else
 fi
 
 # cd to xanmod linux dir and wget config
-cecho ${COL_GRN} "- downloading the kernel config..."
-ex_cmd cd linux && ex_cmd wget $CONFIG_URL -O .config
+cecho ${COL_GRN} "- copying the kernel config..."
+ex_cmd cd linux && cp $CONFIG .config
 
 # enable o3?
 if [ "$O3_PATCH" != "no" ]
