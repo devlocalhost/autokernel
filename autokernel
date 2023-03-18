@@ -100,11 +100,11 @@ mkdir OUT_KERNEL
 
 # start compiling the kernel
 cecho ${COL_YEL} "- COMPILING THE KERNEL..."
-time make arch=i686 CLANG_TRIPLE=i686-linux-gnu- LLVM_IAS=1 CC=clang-12 LD=ld.lld-12 AR=llvm-ar-12 NM=llvm-nm-12 STRIP=llvm-strip-12 OBJCOPY=llvm-objcopy-12 OBJDUMP=llvm-objdump-12 READELF=llvm-readelf-12 HOSTCC=clang-12 HOSTCXX=clang++-12 HOSTAR=llvm-ar-12 HOSTLD=ld.lld-12 LLVM=1 -j16
+make arch=i686 CLANG_TRIPLE=i686-linux-gnu- LLVM_IAS=1 CC=clang-12 LD=ld.lld-12 AR=llvm-ar-12 NM=llvm-nm-12 STRIP=llvm-strip-12 OBJCOPY=llvm-objcopy-12 OBJDUMP=llvm-objdump-12 READELF=llvm-readelf-12 HOSTCC=clang-12 HOSTCXX=clang++-12 HOSTAR=llvm-ar-12 HOSTLD=ld.lld-12 LLVM=1 -j16
 
 # and the modules
 cecho ${COL_YEL} "- compiling the modules..."
-time make arch=i686 CLANG_TRIPLE=i686-linux-gnu- LLVM_IAS=1 CC=clang-12 LD=ld.lld-12 AR=llvm-ar-12 NM=llvm-nm-12 STRIP=llvm-strip-12 OBJCOPY=llvm-objcopy-12 OBJDUMP=llvm-objdump-12 READELF=llvm-readelf-12 HOSTCC=clang-12 HOSTCXX=clang++-12 HOSTAR=llvm-ar-12 HOSTLD=ld.lld-12 LLVM=1 -j16 INSTALL_MOD_PATH=OUT_KERNEL modules_install
+make arch=i686 CLANG_TRIPLE=i686-linux-gnu- LLVM_IAS=1 CC=clang-12 LD=ld.lld-12 AR=llvm-ar-12 NM=llvm-nm-12 STRIP=llvm-strip-12 OBJCOPY=llvm-objcopy-12 OBJDUMP=llvm-objdump-12 READELF=llvm-readelf-12 HOSTCC=clang-12 HOSTCXX=clang++-12 HOSTAR=llvm-ar-12 HOSTLD=ld.lld-12 LLVM=1 -j16 INSTALL_MOD_PATH=OUT_KERNEL modules_install
 
 # copy the kernel and system map file to out kernel
 cecho ${COL_GRN} "- copying arc/x86/boot/bzImage and System.map files to OUT_KERNEL..."
