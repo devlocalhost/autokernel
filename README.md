@@ -1,5 +1,5 @@
 # autokernel
-a better version of [kerninstall](https://github.com/devlocalhost/kerninstall) (right?)
+a better version of [kerninstall](https://github.com/devlocalhost/kerninstall)
 
 # not for everyone
 it was mostly made for me. this can be used only on a ubuntu host (unless debian or any other debian/ubuntu based distro offers the dependecies in the exact same name), and it compiles for i686. but it shouldnt be that hard to modify and make it work for you
