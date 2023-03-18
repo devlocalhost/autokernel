@@ -39,7 +39,7 @@ then
     exit 1
 fi
 
-cecho ${COL_YEL} "    Installing with:"
+cecho ${COL_GRN} "    Installing with:"
 cecho ${COL_YEL} "             OUTPUT: $OUTPUT"
 cecho ${COL_YEL} "      KERNEL_XZ_URL: $2"
 cecho ${COL_YEL} "   KERNEL_FILE_NAME: $KERNEL_FILE_NAME"
