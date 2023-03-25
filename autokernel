@@ -31,7 +31,7 @@ ex_cmd() {
 
 if [ $# -lt 1 ]
 then
-    cecho $COL_GRN "   Usage: $0 OUTPUT CONFIG O3_PATCH DEPTH RT_PATCH EX_MENUCONFIG\nDefaults: OUTPUT: no. accepts: yes, no\n        O3_PATCH: no. ~~~~~~~~~~~~~~~~\n           DEPTH: NONE. accepts: nothing or int (num, value)\n        RT_PATCH: no. accepts: yes, no\n    EX_MENUCOFIG: no. ~~~~~~~~~~~~~~~~"
+    cecho $COL_GRN "   Usage: $0 OUTPUT CONFIG O3_PATCH DEPTH RT_PATCH EX_MENUCONFIG\nDefaults: OUTPUT: no. accepts: yes, no\n        O3_PATCH: no. ~~~~~~~~~~~~~~~~\n           DEPTH: NONE. accepts: NONE or int (num, value)\n        RT_PATCH: no. accepts: yes, no\n    EX_MENUCOFIG: no. ~~~~~~~~~~~~~~~~"
     exit 1
 fi
 
