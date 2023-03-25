@@ -72,7 +72,7 @@ fi
 
 # cd to xanmod linux dir and wget config
 cecho ${COL_GRN} "- copying the kernel config..."
-ex_cmd cd linux && cp $CONFIG .config
+ex_cmd cd linux && wget $CONFIG && cp $CONFIG .config
 
 # enable o3?
 if [ "$O3_PATCH" != "no" ]
