@@ -54,7 +54,7 @@ fi
 
 # installing the dependecies
 cecho ${COL_YEL} "- Installing the dependecies..."
-ex_cmd sudo apt install -y flex m4 lz4 clang-12 lld-12 kmod bc
+ex_cmd sudo apt install -y flex m4 lz4 clang-15 lld-15 kmod bc
 
 # install transfer
 cecho ${COL_GRN} "- downloading the transfer script..."
@@ -92,7 +92,7 @@ fi
 if [ "$EX_MENUCONFIG" != "no" ]
 then
     cecho ${COL_YEL} "- RUNNING MENUCONFIG"
-    make menuconfig LLVM=1 CC=clang-12 LD=ld.lld-12
+    make menuconfig LLVM=1 CC=clang-15 LD=ld.lld-15
 fi
 
 # make dir to paste system map and bzimage
@@ -101,11 +101,11 @@ mkdir OUT_KERNEL
 
 # start compiling the kernel
 cecho ${COL_YEL} "- COMPILING THE KERNEL..."
-make arch=i686 CLANG_TRIPLE=i686-linux-gnu- LLVM_IAS=1 CC=clang-12 LD=ld.lld-12 AR=llvm-ar-12 NM=llvm-nm-12 STRIP=llvm-strip-12 OBJCOPY=llvm-objcopy-12 OBJDUMP=llvm-objdump-12 READELF=llvm-readelf-12 HOSTCC=clang-12 HOSTCXX=clang++-12 HOSTAR=llvm-ar-12 HOSTLD=ld.lld-12 LLVM=1 -j16
+make arch=i686 CLANG_TRIPLE=i686-linux-gnu- LLVM_IAS=1 CC=clang-15 LD=ld.lld-15 AR=llvm-ar-15 NM=llvm-nm-15 STRIP=llvm-strip-15 OBJCOPY=llvm-objcopy-15 OBJDUMP=llvm-objdump-15 READELF=llvm-readelf-15 HOSTCC=clang-15 HOSTCXX=clang++-15 HOSTAR=llvm-ar-15 HOSTLD=ld.lld-15 LLVM=1 -j16
 
 # and the modules
 cecho ${COL_YEL} "- compiling the modules..."
-make arch=i686 CLANG_TRIPLE=i686-linux-gnu- LLVM_IAS=1 CC=clang-12 LD=ld.lld-12 AR=llvm-ar-12 NM=llvm-nm-12 STRIP=llvm-strip-12 OBJCOPY=llvm-objcopy-12 OBJDUMP=llvm-objdump-12 READELF=llvm-readelf-12 HOSTCC=clang-12 HOSTCXX=clang++-12 HOSTAR=llvm-ar-12 HOSTLD=ld.lld-12 LLVM=1 -j16 INSTALL_MOD_PATH=OUT_KERNEL modules_install
+make arch=i686 CLANG_TRIPLE=i686-linux-gnu- LLVM_IAS=1 CC=clang-15 LD=ld.lld-15 AR=llvm-ar-15 NM=llvm-nm-15 STRIP=llvm-strip-15 OBJCOPY=llvm-objcopy-15 OBJDUMP=llvm-objdump-15 READELF=llvm-readelf-15 HOSTCC=clang-15 HOSTCXX=clang++-15 HOSTAR=llvm-ar-15 HOSTLD=ld.lld-15 LLVM=1 -j16 INSTALL_MOD_PATH=OUT_KERNEL modules_install
 
 # copy the kernel and system map file to out kernel
 cecho ${COL_GRN} "- copying arc/x86/boot/bzImage and System.map files to OUT_KERNEL..."
