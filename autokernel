@@ -54,7 +54,7 @@ fi
 
 # installing the dependecies
 cecho ${COL_YEL} "- Installing the dependecies..."
-ex_cmd sudo apt install -y flex m4 lz4 clang-12 lld-12 kmod
+ex_cmd sudo apt install -y flex m4 lz4 clang-12 lld-12 kmod bc
 
 # install transfer
 cecho ${COL_GRN} "- downloading the transfer script..."
