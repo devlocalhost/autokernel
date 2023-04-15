@@ -101,11 +101,11 @@ mkdir OUT_KERNEL
 
 # start compiling the kernel
 cecho ${COL_YEL} "- COMPILING THE KERNEL..."
-make arch=i686 CLANG_TRIPLE=i686-linux-gnu- LLVM_IAS=1 CC=clang-15 LD=ld.lld-15 AR=llvm-ar-15 NM=llvm-nm-15 STRIP=llvm-strip-15 OBJCOPY=llvm-objcopy-15 OBJDUMP=llvm-objdump-15 READELF=llvm-readelf-15 HOSTCC=clang-15 HOSTCXX=clang++-15 HOSTAR=llvm-ar-15 HOSTLD=ld.lld-15 LLVM=1 -j16
+make arch=i686 CLANG_TRIPLE=i686-linux-gnu- LLVM_IAS=1 CC=clang-15 LD=ld.lld-15 AR=llvm-ar-15 NM=llvm-nm-15 STRIP=llvm-strip-15 OBJCOPY=llvm-objcopy-15 OBJDUMP=llvm-objdump-15 READELF=llvm-readelf-15 HOSTCC=clang-15 HOSTCXX=clang++-15 HOSTAR=llvm-ar-15 HOSTLD=ld.lld-15 LLVM=1 -j$(nproc --all)
 
 # and the modules
 cecho ${COL_YEL} "- compiling the modules..."
-make arch=i686 CLANG_TRIPLE=i686-linux-gnu- LLVM_IAS=1 CC=clang-15 LD=ld.lld-15 AR=llvm-ar-15 NM=llvm-nm-15 STRIP=llvm-strip-15 OBJCOPY=llvm-objcopy-15 OBJDUMP=llvm-objdump-15 READELF=llvm-readelf-15 HOSTCC=clang-15 HOSTCXX=clang++-15 HOSTAR=llvm-ar-15 HOSTLD=ld.lld-15 LLVM=1 -j16 INSTALL_MOD_PATH=OUT_KERNEL modules_install
+make arch=i686 CLANG_TRIPLE=i686-linux-gnu- LLVM_IAS=1 CC=clang-15 LD=ld.lld-15 AR=llvm-ar-15 NM=llvm-nm-15 STRIP=llvm-strip-15 OBJCOPY=llvm-objcopy-15 OBJDUMP=llvm-objdump-15 READELF=llvm-readelf-15 HOSTCC=clang-15 HOSTCXX=clang++-15 HOSTAR=llvm-ar-15 HOSTLD=ld.lld-15 LLVM=1 INSTALL_MOD_PATH=OUT_KERNEL modules_install -j$(nproc --all) 
 
 # copy the kernel and system map file to out kernel
 cecho ${COL_GRN} "- copying arc/x86/boot/bzImage and System.map files to OUT_KERNEL..."
