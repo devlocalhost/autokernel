@@ -1,0 +1,42 @@
+From 3e64bf5f537f43895e5722334ea41a6b53b2b58d Mon Sep 17 00:00:00 2001
+From: Skyblueborb <tomaszborbely0710@gmail.com>
+Date: Sun, 4 Dec 2022 22:47:27 +0100
+Subject: [PATCH] Kconfig: add the option to use -O3 compiler optimizations
+
+---
+ Makefile                       | 4 +++-
+ init/Kconfig                   | 6 ++++++
+ 2 files changed, 10 insertions(+), 1 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 78525ebea87629..005f194dddd094 100644
+--- a/Makefile
++++ b/Makefile
+@@ -820,7 +820,9 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning, format-truncation)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning, format-overflow)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning, address-of-packed-member)
+
+-ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
++ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3
++KBUILD_CFLAGS += -O3
++else ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+ KBUILD_CFLAGS += -O2
+ else ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+
+diff --git a/init/Kconfig b/init/Kconfig
+index af30dbf7a6e486..4a0881ffb61b4d 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1414,6 +1414,12 @@ choice
+ 	prompt "Compiler optimization level"
+ 	default CC_OPTIMIZE_FOR_PERFORMANCE
+
++config CC_OPTIMIZE_FOR_PERFORMANCE_O3
++	bool "Optimize for performance (-O3)"
++	help
++	  This is the most aggressive optimization level for the kernel, building
++	  with the "-O3" compiler flag for best performance.
++
+ config CC_OPTIMIZE_FOR_PERFORMANCE
+ 	bool "Optimize for performance (-O2)"
+ 	help
