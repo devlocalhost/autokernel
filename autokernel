@@ -119,6 +119,6 @@ XZ_OPT=-9 tar cJf kernel.tar.xz *
 
 # and upload it
 cecho ${COL_YEL} "- and uploading the tar-xz-chive..."
-../../transfer wet kernel.tar.xz
+../../transfer kernel.tar.xz
 
 cecho ${COL_GRN} "- all done"
