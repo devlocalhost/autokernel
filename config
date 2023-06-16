@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86 6.3.3 Kernel Configuration
+# Linux/x86 6.3.7 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="Ubuntu clang version 15.0.7"
 CONFIG_GCC_VERSION=0
@@ -2902,6 +2902,7 @@ CONFIG_HID_GENERIC=y
 # CONFIG_HID_SIGMAMICRO is not set
 # CONFIG_HID_SONY is not set
 # CONFIG_HID_SPEEDLINK is not set
+# CONFIG_HID_STADIA_FF is not set
 # CONFIG_HID_STEAM is not set
 # CONFIG_HID_STEELSERIES is not set
 # CONFIG_HID_SUNPLUS is not set
